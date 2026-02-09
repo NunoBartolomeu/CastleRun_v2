@@ -1,0 +1,231 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  background: #2a2a2a;
+  padding: 1rem 2rem;
+  border-bottom: 2px solid #3a3a3a;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+#canvas-container {
+  flex: 1;
+  background: #0a0a0a;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  position: relative;
+}
+
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+aside {
+  width: 320px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.section h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #60a5fa;
+  margin-bottom: 0.25rem;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.input-group label {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+}
+
+input[type="number"] {
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  color: #e0e0e0;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: #60a5fa;
+}
+
+button {
+  background: #60a5fa;
+  color: #000;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #3b82f6;
+}
+
+button:disabled {
+  background: #3a3a3a;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.controls button {
+  padding: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  padding: 0.25rem 0;
+}
+
+.stat-label {
+  color: #a0a0a0;
+}
+
+.stat-value {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+#step-info {
+  background: #1a1a1a;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+#step-info > div {
+  margin-bottom: 0.5rem;
+}
+
+#step-info > div:last-child {
+  margin-bottom: 0;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #3a3a3a;
+  flex-shrink: 0;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+/* Section-specific styles */
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.section-info {
+  background: #1a1a1a;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #a0a0a0;
+  line-height: 1.4;
+}
+
+/* Scrollbar styling */
+aside::-webkit-scrollbar {
+  width: 8px;
+}
+
+aside::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+aside::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 4px;
+}
+
+aside::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
+

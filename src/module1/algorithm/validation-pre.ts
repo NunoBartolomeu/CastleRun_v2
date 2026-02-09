@@ -3,12 +3,12 @@
  */
 
 import type { MiningConfig } from '../../shared/domain/models.js'
-import { GRID_CONSTRAINTS } from '../../shared/domain/constants.js'
+import { GRID_CONSTRAINTS, SECTION_CONSTRAINTS } from '../../shared/domain/constants.js'
 import { isInBounds, isOnBorder } from '../../shared/utils/position.js'
 
 /**
  * Calculates theoretical maximum floor percentage for given grid size.
- * Based on odd row/column pattern accounting for no-2x2 rule.
+ * Based on alternating floor pattern accounting for no-2x2 rule.
  */
 export function calculateMaxPercentage(width: number, height: number): number {
   const innerWidth = width - 2
@@ -31,7 +31,7 @@ export function calculateMaxPercentage(width: number, height: number): number {
  * Logs warnings for soft recommendation violations.
  */
 export function validateMiningConfig(config: MiningConfig): void {
-  // Size validation - hard constraints
+  // Grid size validation - hard constraints
   if (config.width < GRID_CONSTRAINTS.MATHEMATICAL_MIN_SIZE || 
       config.height < GRID_CONSTRAINTS.MATHEMATICAL_MIN_SIZE) {
     throw new Error(
@@ -40,7 +40,7 @@ export function validateMiningConfig(config: MiningConfig): void {
     )
   }
   
-  // Size validation - soft recommendations
+  // Grid size validation - soft recommendations
   if (config.width < GRID_CONSTRAINTS.RECOMMENDED_MIN_SIZE || 
       config.height < GRID_CONSTRAINTS.RECOMMENDED_MIN_SIZE) {
     console.warn(
@@ -71,7 +71,7 @@ export function validateMiningConfig(config: MiningConfig): void {
     )
   }
   
-  // Weight validation
+  // Weight validation - hard constraints
   if (config.breakWallWeight <= 0) {
     throw new Error(
       `Break wall weight must be greater than 0. Got ${config.breakWallWeight}`
@@ -81,6 +81,46 @@ export function validateMiningConfig(config: MiningConfig): void {
   if (config.backtrackWeight <= 0) {
     throw new Error(
       `Backtrack weight must be greater than 0. Got ${config.backtrackWeight}`
+    )
+  }
+  
+  // Section validation
+  const sectionsX = config.sectionsX ?? 1
+  const sectionsY = config.sectionsY ?? 1
+  
+  if (sectionsX < 1 || sectionsY < 1) {
+    throw new Error(
+      `Section counts must be at least 1. Got sectionsX=${sectionsX}, sectionsY=${sectionsY}`
+    )
+  }
+  
+  if (sectionsX > config.width || sectionsY > config.height) {
+    throw new Error(
+      `Cannot have more sections than grid dimensions. ` +
+      `Grid: ${config.width}x${config.height}, Sections: ${sectionsX}x${sectionsY}`
+    )
+  }
+  
+  // Calculate section sizes
+  const sectionWidth = Math.floor(config.width / sectionsX)
+  const sectionHeight = Math.floor(config.height / sectionsY)
+  const minSectionSize = Math.min(sectionWidth, sectionHeight)
+  
+  // Hard minimum section size
+  if (minSectionSize < SECTION_CONSTRAINTS.MIN_SECTION_SIZE) {
+    throw new Error(
+      `Section size too small (${sectionWidth}x${sectionHeight}). ` +
+      `Minimum ${SECTION_CONSTRAINTS.MIN_SECTION_SIZE}x${SECTION_CONSTRAINTS.MIN_SECTION_SIZE} required. ` +
+      `Reduce section count or increase grid size.`
+    )
+  }
+  
+  // Recommended minimum section size
+  if (minSectionSize < SECTION_CONSTRAINTS.RECOMMENDED_SECTION_SIZE) {
+    console.warn(
+      `Warning: Section size (${sectionWidth}x${sectionHeight}) is below recommended ` +
+      `${SECTION_CONSTRAINTS.RECOMMENDED_SECTION_SIZE}x${SECTION_CONSTRAINTS.RECOMMENDED_SECTION_SIZE}. ` +
+      `Consider reducing section count for better results.`
     )
   }
   
@@ -96,6 +136,14 @@ export function validateMiningConfig(config: MiningConfig): void {
     if (isOnBorder(config.startingPos, config.width, config.height)) {
       throw new Error(
         `Starting position (${config.startingPos.x}, ${config.startingPos.y}) cannot be on border`
+      )
+    }
+    
+    // Warn if starting position is set but sections are being used
+    if (sectionsX > 1 || sectionsY > 1) {
+      console.warn(
+        `Warning: Starting position is ignored when using multiple sections. ` +
+        `Each section will get a random starting position.`
       )
     }
   }

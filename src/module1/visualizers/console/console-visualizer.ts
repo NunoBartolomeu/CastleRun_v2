@@ -3,7 +3,7 @@
  * Renders the final grid to terminal using emojis.
  */
 
-import { runMiningAlgorithm, TileType, MiningAction, type Grid, type MiningStats, type PathNode } from '../../../index.js'
+import { runMiningAlgorithm, TileType, MiningAction, type Grid, type MiningStats, type PathNode } from '../../index.js'
 import * as readline from 'readline'
 
 /**
@@ -200,11 +200,13 @@ async function main() {
   
   // Configuration for testing
   const config = {
-    width: 60,
-    height: 30,
-    targetPercentage: 30,
-    breakWallWeight: 3,
+    width: 50,
+    height: 50,
+    targetPercentage: 50,
+    breakWallWeight: 5,
     backtrackWeight: 1,
+    sectionsX: 5,
+    sectionsY: 5,
     seed: 47198//Date.now() // You can set a fixed seed for reproducibility
   }
   

@@ -4,193 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Castle Run - Map Visualizer</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #1a1a1a;
-      color: #e0e0e0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-    
-    header {
-      background: #2a2a2a;
-      padding: 1rem 2rem;
-      border-bottom: 2px solid #3a3a3a;
-    }
-    
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-    
-    main {
-      flex: 1;
-      display: flex;
-      gap: 1rem;
-      padding: 1rem;
-      overflow: hidden;
-    }
-    
-    #canvas-container {
-      flex: 1;
-      background: #0a0a0a;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: auto;
-      position: relative;
-    }
-    
-    canvas {
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-    }
-    
-    aside {
-      width: 300px;
-      background: #2a2a2a;
-      border-radius: 8px;
-      padding: 1.5rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-    
-    .section {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    
-    .section h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #60a5fa;
-      margin-bottom: 0.25rem;
-    }
-    
-    .config-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-    }
-    
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    
-    .input-group label {
-      font-size: 0.75rem;
-      color: #a0a0a0;
-    }
-    
-    input[type="number"] {
-      background: #1a1a1a;
-      border: 1px solid #3a3a3a;
-      color: #e0e0e0;
-      padding: 0.5rem;
-      border-radius: 4px;
-      font-size: 0.875rem;
-      width: 100%;
-    }
-
-    .config-grid .input-group {
-      min-width: 0;
-    }
-
-    .input-group input {
-      max-width: 100%;
-    }
-
-    button {
-      background: #60a5fa;
-      color: #000;
-      border: none;
-      padding: 0.75rem 1rem;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.875rem;
-      transition: background 0.2s;
-    }
-    
-    button:hover {
-      background: #3b82f6;
-    }
-    
-    button:disabled {
-      background: #3a3a3a;
-      color: #666;
-      cursor: not-allowed;
-    }
-    
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-    }
-    
-    .controls button {
-      padding: 0.5rem;
-      font-size: 0.75rem;
-    }
-    
-    .stat-item {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.875rem;
-      padding: 0.25rem 0;
-    }
-    
-    .stat-label {
-      color: #a0a0a0;
-    }
-    
-    .stat-value {
-      color: #e0e0e0;
-      font-weight: 500;
-    }
-    
-    #step-info {
-      background: #1a1a1a;
-      padding: 1rem;
-      border-radius: 6px;
-      font-size: 0.875rem;
-    }
-    
-    .legend {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-    }
-    
-    .legend-color {
-      width: 20px;
-      height: 20px;
-      border-radius: 3px;
-      border: 1px solid #3a3a3a;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
@@ -208,11 +22,11 @@
         <div class="config-grid">
           <div class="input-group">
             <label>Width</label>
-            <input type="number" id="width" value="30" min="7" max="200">
+            <input type="number" id="width" value="100" min="7" max="1000">
           </div>
           <div class="input-group">
             <label>Height</label>
-            <input type="number" id="height" value="30" min="7" max="200">
+            <input type="number" id="height" value="100" min="7" max="1000">
           </div>
           <div class="input-group">
             <label>Target %</label>
@@ -230,6 +44,14 @@
             <label>Backtrack Weight</label>
             <input type="number" id="backtrackWeight" value="1" min="1">
           </div>
+          <div class="input-group">
+            <label>Sections X</label>
+            <input type="number" id="sectionsX" value="1" min="1" max="20">
+          </div>
+          <div class="input-group">
+            <label>Sections Y</label>
+            <input type="number" id="sectionsY" value="1" min="1" max="20">
+          </div>
         </div>
         <button id="generate">Generate Map</button>
       </div>
@@ -241,12 +63,12 @@
           <div>Action: <span id="current-action">-</span></div>
           <div>Position: <span id="current-position">-</span></div>
         </div>
-
+        
         <div class="controls">
           <button id="zoom-out">🔍- Zoom Out</button>
           <button id="zoom-in">🔍+ Zoom In</button>
         </div>
-
+        
         <div class="controls">
           <button id="first">⏮ First</button>
           <button id="last">⏭ Last</button>
@@ -268,9 +90,9 @@
         <h2>Save / Load</h2>
         <button id="save">💾 Save Map</button>
         <button id="load">📂 Load Map</button>
-        <input type="file" id="file-input" accept=".json" style="display: none;">
+        <input type="file" id="file-input" accept=".json">
       </div>
-
+      
       <div class="section">
         <h2>Legend</h2>
         <div class="legend">
@@ -295,6 +117,6 @@
     </aside>
   </main>
   
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

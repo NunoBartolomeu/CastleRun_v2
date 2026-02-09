@@ -1,11 +1,11 @@
-import { runMiningAlgorithm, TileType, MiningAction } from '../../../../dist/index.js'
+import { runMiningAlgorithm, TileType, MiningAction } from '../../../../dist/module1/index.js'
 
 // Canvas setup
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
-let TILE_SIZE = 20
-const MIN_TILE_SIZE = 5
+let TILE_SIZE = 10
+const MIN_TILE_SIZE = 2
 const MAX_TILE_SIZE = 50
 
 const colors = {
@@ -92,7 +92,9 @@ function saveResult() {
       targetPercentage: parseInt(document.getElementById('target').value),
       breakWallWeight: parseInt(document.getElementById('breakWeight').value),
       backtrackWeight: parseInt(document.getElementById('backtrackWeight').value),
-      seed: parseInt(document.getElementById('seed').value)
+      seed: parseInt(document.getElementById('seed').value),
+      sectionsX: parseInt(document.getElementById('sectionsX').value),
+      sectionsY: parseInt(document.getElementById('sectionsY').value)
     },
     grid: currentResult.grid,
     path: currentResult.path,
@@ -115,12 +117,10 @@ function loadResult(file) {
     try {
       const data = JSON.parse(e.target.result)
       
-      // Validate data structure
       if (!data.grid || !data.path || !data.stats) {
         throw new Error('Invalid map file format')
       }
       
-      // Restore result
       currentResult = {
         grid: data.grid,
         path: data.path,
@@ -136,41 +136,14 @@ function loadResult(file) {
         document.getElementById('breakWeight').value = data.config.breakWallWeight
         document.getElementById('backtrackWeight').value = data.config.backtrackWeight
         document.getElementById('seed').value = data.config.seed
+        document.getElementById('sectionsX').value = data.config.sectionsX || 1
+        document.getElementById('sectionsY').value = data.config.sectionsY || 1
       }
       
-      // Show visualizer and stats
       document.getElementById('visualizer-section').style.display = 'flex'
       document.getElementById('stats-section').style.display = 'flex'
       
-      // Render stats
-      const stats = currentResult.stats
-      document.getElementById('stats').innerHTML = `
-        <div class="stat-item">
-          <span class="stat-label">Grid Size</span>
-          <span class="stat-value">${data.config.width}x${data.config.height}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Floor %</span>
-          <span class="stat-value">${stats.finalPercentage.toFixed(2)}%</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Total Steps</span>
-          <span class="stat-value">${stats.totalSteps}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Break Actions</span>
-          <span class="stat-value">${stats.breakActions}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Backtrack Actions</span>
-          <span class="stat-value">${stats.backtrackActions}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Execution Time</span>
-          <span class="stat-value">${stats.executionTimeMs.toFixed(2)}ms</span>
-        </div>
-      `
-      
+      updateStats(data.config, currentResult.stats)
       updateStepInfo()
       
       alert('Map loaded successfully!')
@@ -181,6 +154,40 @@ function loadResult(file) {
   reader.readAsText(file)
 }
 
+// Update stats display
+function updateStats(config, stats) {
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-item">
+      <span class="stat-label">Grid Size</span>
+      <span class="stat-value">${config.width}x${config.height}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Sections</span>
+      <span class="stat-value">${config.sectionsX || 1}x${config.sectionsY || 1}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Floor %</span>
+      <span class="stat-value">${stats.finalPercentage.toFixed(2)}%</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Total Steps</span>
+      <span class="stat-value">${stats.totalSteps}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Break Actions</span>
+      <span class="stat-value">${stats.breakActions}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Backtrack Actions</span>
+      <span class="stat-value">${stats.backtrackActions}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Execution Time</span>
+      <span class="stat-value">${stats.executionTimeMs.toFixed(2)}ms</span>
+    </div>
+  `
+}
+
 // Generate map
 document.getElementById('generate').addEventListener('click', async () => {
   const config = {
@@ -189,7 +196,9 @@ document.getElementById('generate').addEventListener('click', async () => {
     targetPercentage: parseInt(document.getElementById('target').value),
     breakWallWeight: parseInt(document.getElementById('breakWeight').value),
     backtrackWeight: parseInt(document.getElementById('backtrackWeight').value),
-    seed: parseInt(document.getElementById('seed').value)
+    seed: parseInt(document.getElementById('seed').value),
+    sectionsX: parseInt(document.getElementById('sectionsX').value),
+    sectionsY: parseInt(document.getElementById('sectionsY').value)
   }
   
   try {
@@ -199,39 +208,10 @@ document.getElementById('generate').addEventListener('click', async () => {
     currentResult = runMiningAlgorithm(config)
     currentStep = 0
     
-    // Show visualizer and stats
     document.getElementById('visualizer-section').style.display = 'flex'
     document.getElementById('stats-section').style.display = 'flex'
     
-    // Render stats
-    const stats = currentResult.stats
-    document.getElementById('stats').innerHTML = `
-      <div class="stat-item">
-        <span class="stat-label">Grid Size</span>
-        <span class="stat-value">${config.width}x${config.height}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Floor %</span>
-        <span class="stat-value">${stats.finalPercentage.toFixed(2)}%</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Total Steps</span>
-        <span class="stat-value">${stats.totalSteps}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Break Actions</span>
-        <span class="stat-value">${stats.breakActions}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Backtrack Actions</span>
-        <span class="stat-value">${stats.backtrackActions}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Execution Time</span>
-        <span class="stat-value">${stats.executionTimeMs.toFixed(2)}ms</span>
-      </div>
-    `
-    
+    updateStats(config, currentResult.stats)
     updateStepInfo()
     
     document.getElementById('generate').disabled = false
@@ -246,29 +226,27 @@ document.getElementById('generate').addEventListener('click', async () => {
 // Zoom controls
 document.getElementById('zoom-in').addEventListener('click', () => {
   if (TILE_SIZE < MAX_TILE_SIZE) {
-    TILE_SIZE += 5
+    TILE_SIZE += 2
     updateStepInfo()
   }
 })
 
 document.getElementById('zoom-out').addEventListener('click', () => {
   if (TILE_SIZE > MIN_TILE_SIZE) {
-    TILE_SIZE -= 5
+    TILE_SIZE -= 2
     updateStepInfo()
   }
 })
 
-// Save/Load controls
+// Save/Load
 document.getElementById('save').addEventListener('click', saveResult)
 document.getElementById('load').addEventListener('click', () => {
   document.getElementById('file-input').click()
 })
 document.getElementById('file-input').addEventListener('change', (e) => {
   const file = e.target.files[0]
-  if (file) {
-    loadResult(file)
-  }
-  e.target.value = '' // Reset input
+  if (file) loadResult(file)
+  e.target.value = ''
 })
 
 // Playback controls

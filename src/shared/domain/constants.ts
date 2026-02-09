@@ -10,3 +10,8 @@ export const GRID_CONSTRAINTS = {
   ALLOWED_MAX_PERCENT: 70,       // Hard limit enforced by validation
   RECOMMENDED_MAX_PERCENT: 50    // Optimal for gameplay balance
 } as const
+
+export const SECTION_CONSTRAINTS = {
+  MIN_SECTION_SIZE: 10,          // Hard minimum section dimension
+  RECOMMENDED_SECTION_SIZE: 50   // Recommended minimum section dimension
+} as const

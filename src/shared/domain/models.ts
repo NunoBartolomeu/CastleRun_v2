@@ -104,6 +104,8 @@ export interface MiningConfig {
   backtrackPenalty?: number
   startingPos?: Position
   seed?: number
+  sectionsX?: number
+  sectionsY?: number
 }
 
 // ============================================================================
