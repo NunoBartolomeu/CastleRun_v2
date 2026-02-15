@@ -2,7 +2,7 @@
  * Module 2.1: Biome visualization and controls
  */
 
-import { assignBiomes, BiomeAction } from '../../../../dist/module2/index.js'
+import { assignBiomes, BiomeAction } from '../../../../dist/module2-1/index.js'
 import { state, MIN_TILE_SIZE, MAX_TILE_SIZE } from '../state.js'
 import { renderGrid } from '../rendering.js'
 import { BIOME_COLORS, BIOME_NAMES } from '../constants.js'

@@ -5,6 +5,7 @@
 import { state } from '../state.js'
 import { updateModule1Visualizer } from '../modules/module1.js'
 import { updateModule2_1Visualizer } from '../modules/module2-1.js'
+import { updateModule2_2Visualizer } from '../modules/module2-2.js'
 import { getBiomeList } from './biome-manager.js'
 import { 
   createCompactSave, 
@@ -45,6 +46,15 @@ function getModule2Config() {
   }
 }
 
+function getModule2_2Config() {
+  return {
+    entryCount: parseInt(document.getElementById('m22-entryCount').value),
+    exitCount: parseInt(document.getElementById('m22-exitCount').value),
+    keyCount: parseInt(document.getElementById('m22-keyCount').value),
+    seed: parseInt(document.getElementById('m22-seed').value)
+  }
+}
+
 function saveMap(compact) {
   let data
   
@@ -52,34 +62,47 @@ function saveMap(compact) {
     // Compact format
     const module1Config = state.data.module1 ? getModule1Config() : null
     const module2Config = state.data.module2_1 ? getModule2Config() : null
+    const module22Config = state.data.module2_2 ? getModule2_2Config() : null
     
     data = createCompactSave(
       state.data.module1, 
       state.data.module2_1,
+      state.data.module2_2,
       module1Config,
-      module2Config
+      module2Config,
+      module22Config
     )
   } else {
     // Full format
     const module1Data = state.data.module1 ? {
       config: getModule1Config(),
-      grid: cleanBiomesFromGrid(state.data.module1.grid),
+      grid: cleanBiomesAndInteractables(state.data.module1.grid),
       path: state.data.module1.path,
       stats: state.data.module1.stats
     } : null
     
     const module2Data = state.data.module2_1 ? {
       config: getModule2Config(),
-      grid: state.data.module2_1.grid,
+      grid: cleanInteractables(state.data.module2_1.grid),
       path: state.data.module2_1.path,
       stats: state.data.module2_1.stats
     } : null
     
+    const module22Data = state.data.module2_2 ? {
+      config: getModule2_2Config(),
+      grid: state.data.module2_2.grid,
+      entries: state.data.module2_2.entries,
+      exits: state.data.module2_2.exits,
+      keys: state.data.module2_2.keys,
+      stats: state.data.module2_2.stats
+    } : null
+    
     data = {
-      version: '2.0',
+      version: '3.0',
       timestamp: new Date().toISOString(),
       module1: module1Data,
-      module2_1: module2Data
+      module2_1: module2Data,
+      module2_2: module22Data
     }
   }
   
@@ -92,12 +115,11 @@ function saveMap(compact) {
   a.click()
   URL.revokeObjectURL(url)
   
-  // Show file size info
   const sizeKB = (blob.size / 1024).toFixed(2)
   console.log(`Saved ${suffix} format: ${sizeKB} KB`)
 }
 
-function cleanBiomesFromGrid(grid) {
+function cleanBiomesAndInteractables(grid) {
   const tiles = []
   for (let y = 0; y < grid.height; y++) {
     const row = []
@@ -106,7 +128,26 @@ function cleanBiomesFromGrid(grid) {
       row.push({
         type: original.type,
         position: { x: original.position.x, y: original.position.y },
-        biome: null
+        biome: null,
+        interactable: null
+      })
+    }
+    tiles.push(row)
+  }
+  return { width: grid.width, height: grid.height, tiles }
+}
+
+function cleanInteractables(grid) {
+  const tiles = []
+  for (let y = 0; y < grid.height; y++) {
+    const row = []
+    for (let x = 0; x < grid.width; x++) {
+      const original = grid.tiles[y][x]
+      row.push({
+        type: original.type,
+        position: { x: original.position.x, y: original.position.y },
+        biome: original.biome,
+        interactable: null
       })
     }
     tiles.push(row)
@@ -137,11 +178,12 @@ function handleFileLoad(e) {
         console.log('Loading full format...')
         loadedData = {
           module1: data.module1,
-          module2_1: data.module2_1
+          module2_1: data.module2_1,
+          module2_2: data.module2_2
         }
       }
       
-      // Restore data
+      // Restore Module 1
       if (loadedData.module1) {
         state.data.module1 = loadedData.module1
         state.visualizer.module1.currentStep = 0
@@ -196,6 +238,7 @@ function handleFileLoad(e) {
         `
       }
       
+      // Restore Module 2.1
       if (loadedData.module2_1) {
         state.data.module2_1 = loadedData.module2_1
         state.visualizer.module2_1.currentStep = 0
@@ -212,11 +255,26 @@ function handleFileLoad(e) {
         }
       }
       
+      // Restore Module 2.2
+      if (loadedData.module2_2) {
+        state.data.module2_2 = loadedData.module2_2
+        
+        // Restore Module 2.2 config to UI if available
+        if (loadedData.module2_2.config) {
+          document.getElementById('m22-entryCount').value = loadedData.module2_2.config.entryCount
+          document.getElementById('m22-exitCount').value = loadedData.module2_2.config.exitCount
+          document.getElementById('m22-keyCount').value = loadedData.module2_2.config.keyCount
+          document.getElementById('m22-seed').value = loadedData.module2_2.config.seed
+        }
+      }
+      
       // Refresh current view
       if (state.activeModule === 'module1' && state.data.module1) {
         updateModule1Visualizer()
       } else if (state.activeModule === 'module2-1' && state.data.module2_1) {
         updateModule2_1Visualizer()
+      } else if (state.activeModule === 'module2-2' && state.data.module2_2) {
+        updateModule2_2Visualizer()
       }
       
       alert('Map loaded successfully!')

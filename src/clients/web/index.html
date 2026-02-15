@@ -27,6 +27,9 @@
           <button class="module-tab" data-module="module2-1">
             🌍 Module 2.1
           </button>
+          <button class="module-tab" data-module="module2-2">
+            🚪 Module 2.2
+          </button>
         </div>
       </div>
       
@@ -115,6 +118,34 @@
           
           <button id="generate-module2-1" class="btn-primary">Assign Biomes</button>
         </div>
+
+        <!-- Module 2.2 Config (NEW) -->
+        <div id="config-module2-2" class="config-panel">
+          <div class="info-box">
+            ℹ️ Load a Module 2.1 map first, or generate biomes in Module 2.1 tab
+          </div>
+          
+          <div class="config-grid">
+            <div class="input-group">
+              <label>Entry Count</label>
+              <input type="number" id="m22-entryCount" value="4" min="1" max="20">
+            </div>
+            <div class="input-group">
+              <label>Exit Count</label>
+              <input type="number" id="m22-exitCount" value="3" min="1" max="20">
+            </div>
+            <div class="input-group">
+              <label>Key Count</label>
+              <input type="number" id="m22-keyCount" value="5" min="1" max="50">
+            </div>
+            <div class="input-group">
+              <label>Seed</label>
+              <input type="number" id="m22-seed" value="99999">
+            </div>
+          </div>
+          
+          <button id="generate-module2-2" class="btn-primary">Place Spawn Points</button>
+        </div>
       </div>
       
       <!-- VISUALIZER CONTROLS -->
@@ -164,6 +195,14 @@
             <button id="m2-show-final">🏁 Final</button>
           </div>
         </div>
+
+        <!-- Module 2.2 Controls (NEW) -->
+        <div id="controls-module2-2" class="controls-panel">
+          <div class="controls-grid">
+            <button id="m22-zoom-out" class="btn-icon">🔍-</button>
+            <button id="m22-zoom-in" class="btn-icon">🔍+</button>
+          </div>
+        </div>
       </div>
       
       <!-- LEGEND -->
@@ -194,6 +233,22 @@
         <div id="legend-module2-1" class="legend-panel">
           <div id="biome-legend"></div>
         </div>
+
+        <!-- Module 2.2 Legend (NEW) -->
+        <div id="legend-module2-2" class="legend-panel">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #22c55e;"></div>
+            <span>Entry</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ef4444;"></div>
+            <span>Exit</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #eab308;"></div>
+            <span>Key</span>
+          </div>
+        </div>
       </div>
       
       <!-- STATISTICS -->
@@ -205,6 +260,9 @@
         
         <!-- Module 2.1 Stats -->
         <div id="stats-module2-1" class="stats-panel"></div>
+
+        <!-- Module 2.2 Stats (NEW) -->
+        <div id="stats-module2-2" class="stats-panel"></div>
       </div>
       
       <!-- SAVE/LOAD -->

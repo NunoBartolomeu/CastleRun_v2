@@ -15,9 +15,10 @@ export function createEmptyGrid(width: number, height: number, fillType: TileTyp
     const row: Tile[] = []
     for (let x = 0; x < width; x++) {
       row.push({
-        type: fillType,
         position: { x, y },
-        biome: null  // ← CHANGED from region
+        type: fillType,
+        biome: null,  // ← CHANGED from region
+        interactable: null
       })
     }
     tiles.push(row)
@@ -75,9 +76,10 @@ export function cloneGrid(grid: Grid): Grid {
     for (let x = 0; x < grid.width; x++) {
       const original = grid.tiles[y][x]
       row.push({
-        type: original.type,
         position: { x: original.position.x, y: original.position.y },
-        biome: original.biome  // ← CHANGED from region
+        type: original.type,
+        biome: original.biome,  // ← CHANGED from region
+        interactable: original.interactable
       })
     }
     tiles.push(row)

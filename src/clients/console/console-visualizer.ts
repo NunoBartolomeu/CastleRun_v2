@@ -95,9 +95,10 @@ function reconstructGridAtStep(path: PathNode[], stepIndex: number, width: numbe
     const row = []
     for (let x = 0; x < width; x++) {
       row.push({
-        type: TileType.WALL,
         position: { x, y },
-        biome: null
+        type: TileType.WALL,
+        biome: null,
+        interactable: null
       })
     }
     grid.tiles.push(row)

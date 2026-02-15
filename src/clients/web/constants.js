@@ -51,3 +51,10 @@ export const BIOME_NAMES = {
   [BiomeType.DESERT]: 'Desert',
   [BiomeType.DUNGEON]: 'Dungeon'
 }
+
+// NEW: Interactable colors
+export const INTERACTABLE_COLORS = {
+  'ENTRY': '#22c55e',   // Green
+  'EXIT': '#ef4444',    // Red
+  'KEY': '#eab308'      // Yellow
+}

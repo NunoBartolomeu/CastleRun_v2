@@ -6,8 +6,9 @@ export const state = {
   activeModule: 'module1',
   
   data: {
-    module1: null,    // MiningResult
-    module2_1: null   // BiomeAssignmentResult
+    module1: null,      // MiningResult
+    module2_1: null,    // BiomeAssignmentResult
+    module2_2: null     // SpawnPointResult (NEW)
   },
   
   visualizer: {
@@ -24,6 +25,9 @@ export const state = {
       playInterval: null,
       tileSize: 10,
       showFinal: false
+    },
+    module2_2: {
+      tileSize: 10  // Just shows final, no animation
     }
   }
 }

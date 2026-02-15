@@ -59,6 +59,16 @@ export enum BiomeAction {
   SKIP = 'SKIP'           // Failed conversion or already assigned
 }
 
+/**
+ * Interactable objects that can be placed on tiles.
+ */
+export enum InteractableType {
+  ENTRY = 'ENTRY',
+  EXIT = 'EXIT',
+  KEY = 'KEY'
+  // Future: CHEST, TRAP, MONSTER, etc.
+}
+
 // ============================================================================
 // CORE DOMAIN MODELS
 // ============================================================================
@@ -76,9 +86,10 @@ export interface Position {
  * Individual cell in the grid.
  */
 export interface Tile {
-  type: TileType
   position: Position
-  biome: BiomeType | null  // null until Module 2.1 assigns biomes
+  type: TileType
+  biome: BiomeType | null
+  interactable: InteractableType | null
 }
 
 /**
@@ -212,6 +223,54 @@ export interface BiomeAssignmentResult {
   grid: Grid
   path: BiomePathNode[]
   stats: BiomeStats
+}
+
+// ============================================================================
+// MODULE 2.2: SPAWN POINTS CONFIGURATION
+// ============================================================================
+
+/**
+ * Configuration for spawn point placement.
+ */
+export interface SpawnPointConfig {
+  entryCount: number        // Total entry points
+  exitCount: number         // Total exit points
+  keyCount: number          // Total keys (recommend: exitCount + extras)
+  seed?: number
+}
+
+// ============================================================================
+// MODULE 2.2: SPAWN POINTS OUTPUT
+// ============================================================================
+
+/**
+ * Statistics from spawn point placement.
+ */
+export interface SpawnPointStats {
+  c1Tiles: number          // Dead ends (1 connection)
+  c2Tiles: number          // 2 connections
+  c3Tiles: number          // 3 connections
+  c4Tiles: number          // Most connected (4 connections)
+  
+  entriesPlacedOnC4: number
+  entriesPlacedOnC3: number
+  
+  exitsPlacedOnC1: number
+  exitsPlacedOnC2: number
+  
+  keysPlacedOnC3: number
+  keysPlacedOnC2: number
+}
+
+/**
+ * Complete result from spawn point placement.
+ */
+export interface SpawnPointResult {
+  grid: Grid               // Grid with interactables assigned
+  entries: Position[]      // Entry positions
+  exits: Position[]        // Exit positions
+  keys: Position[]         // Key positions
+  stats: SpawnPointStats
 }
 
 // ============================================================================

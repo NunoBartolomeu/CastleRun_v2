@@ -37,6 +37,20 @@ const CHAR_TO_BIOME = {
   'U': 'DUNGEON'
 }
 
+const INTERACTABLE_TO_CHAR = {
+  null: 'N',
+  'ENTRY': 'E',
+  'EXIT': 'X',
+  'KEY': 'K'
+}
+
+const CHAR_TO_INTERACTABLE = {
+  'N': null,
+  'E': 'ENTRY',
+  'X': 'EXIT',
+  'K': 'KEY'
+}
+
 const ACTION_TO_CHAR = {
   'BREAK': 'B',
   'BACKTRACK': 'T',
@@ -77,6 +91,17 @@ export function encodeModule2Grid(grid) {
   return encoded
 }
 
+export function encodeModule22Grid(grid) {
+  let encoded = ''
+  for (let y = 0; y < grid.height; y++) {
+    for (let x = 0; x < grid.width; x++) {
+      const tile = grid.tiles[y][x]
+      encoded += INTERACTABLE_TO_CHAR[tile.interactable]
+    }
+  }
+  return encoded
+}
+
 export function encodePath(path, module) {
   const parts = []
   
@@ -89,13 +114,14 @@ export function encodePath(path, module) {
   return parts.join('|')
 }
 
-export function createCompactSave(module1Data, module2Data, module1Config, module2Config) {
+export function createCompactSave(module1Data, module2Data, module22Data, module1Config, module2Config, module22Config) {
   const compact = {
-    version: '2.0-compact',
+    version: '3.0-compact',
     timestamp: new Date().toISOString(),
     format: {
       module1_grid: 'V=VOID, W=WALL, F=FLOOR',
       module2_grid: 'Biome codes only (N=null, W=WATER, F=FOREST, S=SWAMP, M=MAGMA, I=ICE, D=DESERT, U=DUNGEON)',
+      module2_2_grid: 'Interactable codes only (N=null, E=ENTRY, X=EXIT, K=KEY)',
       path: 'Pipe-separated: x,y,action,timestamp',
       actions_m1: 'B=BREAK, T=BACKTRACK',
       actions_m2: 'C=CONVERT, S=SKIP'
@@ -120,6 +146,14 @@ export function createCompactSave(module1Data, module2Data, module1Config, modul
     }
   }
   
+  if (module22Data && module22Config) {
+    compact.module2_2 = {
+      config: module22Config,
+      grid: encodeModule22Grid(module22Data.grid),
+      stats: module22Data.stats
+    }
+  }
+  
   return compact
 }
 
@@ -137,7 +171,8 @@ export function decodeModule1Grid(gridString, width, height) {
       row.push({
         type: CHAR_TO_TYPE[gridString[index++]],
         position: { x, y },
-        biome: null
+        biome: null,
+        interactable: null
       })
     }
     tiles.push(row)
@@ -157,13 +192,50 @@ export function decodeModule2Grid(module1Grid, biomeString) {
       row.push({
         type: originalTile.type,
         position: { x, y },
-        biome: CHAR_TO_BIOME[biomeString[index++]]
+        biome: CHAR_TO_BIOME[biomeString[index++]],
+        interactable: null
       })
     }
     tiles.push(row)
   }
   
   return { width: module1Grid.width, height: module1Grid.height, tiles }
+}
+
+export function decodeModule22Grid(module2Grid, interactableString) {
+  const tiles = []
+  const entries = []
+  const exits = []
+  const keys = []
+  let index = 0
+  
+  for (let y = 0; y < module2Grid.height; y++) {
+    const row = []
+    for (let x = 0; x < module2Grid.width; x++) {
+      const originalTile = module2Grid.tiles[y][x]
+      const interactable = CHAR_TO_INTERACTABLE[interactableString[index++]]
+      
+      row.push({
+        type: originalTile.type,
+        position: { x, y },
+        biome: originalTile.biome,
+        interactable: interactable
+      })
+      
+      // Track positions for entries, exits, keys
+      if (interactable === 'ENTRY') entries.push({ x, y })
+      if (interactable === 'EXIT') exits.push({ x, y })
+      if (interactable === 'KEY') keys.push({ x, y })
+    }
+    tiles.push(row)
+  }
+  
+  return { 
+    grid: { width: module2Grid.width, height: module2Grid.height, tiles },
+    entries,
+    exits,
+    keys
+  }
 }
 
 export function decodePath(pathString, module) {
@@ -192,9 +264,6 @@ export function decodePath(pathString, module) {
   return path
 }
 
-//107
-//2523
-
 export function isCompactFormat(data) {
   return data.version && data.version.includes('compact')
 }
@@ -202,7 +271,8 @@ export function isCompactFormat(data) {
 export function loadCompactSave(data) {
   const result = {
     module1: null,
-    module2_1: null
+    module2_1: null,
+    module2_2: null
   }
   
   if (data.module1) {
@@ -227,6 +297,19 @@ export function loadCompactSave(data) {
       grid,
       path,
       stats: data.module2_1.stats
+    }
+  }
+  
+  if (data.module2_2 && result.module2_1) {
+    const decoded = decodeModule22Grid(result.module2_1.grid, data.module2_2.grid)
+    
+    result.module2_2 = {
+      config: data.module2_2.config,
+      grid: decoded.grid,
+      entries: decoded.entries,
+      exits: decoded.exits,
+      keys: decoded.keys,
+      stats: data.module2_2.stats
     }
   }
   

@@ -5,6 +5,7 @@
 import { state } from '../state.js'
 import { updateModule1Visualizer } from '../modules/module1.js'
 import { updateModule2_1Visualizer } from '../modules/module2-1.js'
+import { updateModule2_2Visualizer } from '../modules/module2-2.js'
 
 export function initModuleSwitcher() {
   document.querySelectorAll('.module-tab').forEach(tab => {
@@ -45,5 +46,7 @@ export function switchModule(module) {
     updateModule1Visualizer()
   } else if (module === 'module2-1' && state.data.module2_1) {
     updateModule2_1Visualizer()
+  } else if (module === 'module2-2' && state.data.module2_2) {
+    updateModule2_2Visualizer()
   }
 }
