@@ -26,8 +26,7 @@ export type {
 export { 
   TileType, 
   MiningAction, 
-  Direction,
-  RegionType 
+  Direction
 } from '../shared/domain/models.js'
 
 export { GRID_CONSTRAINTS, SECTION_CONSTRAINTS } from '../shared/domain/constants.js'

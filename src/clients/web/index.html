@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Castle Run - Map Visualizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🏰 Castle Run - Map Visualizer</h1>
+  </header>
+  
+  <main>
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+    
+    <aside id="controls-panel">
+      <!-- MODULE SELECTOR -->
+      <div class="section">
+        <h2>Module</h2>
+        <div class="module-tabs">
+          <button class="module-tab active" data-module="module1">
+            ⛏️ Module 1
+          </button>
+          <button class="module-tab" data-module="module2-1">
+            🌍 Module 2.1
+          </button>
+        </div>
+      </div>
+      
+      <!-- CONFIGURATION -->
+      <div class="section">
+        <h2>Configuration</h2>
+        
+        <!-- Module 1 Config -->
+        <div id="config-module1" class="config-panel active">
+          <div class="config-grid">
+            <div class="input-group">
+              <label>Width</label>
+              <input type="number" id="m1-width" value="50" min="7" max="1000">
+            </div>
+            <div class="input-group">
+              <label>Height</label>
+              <input type="number" id="m1-height" value="50" min="7" max="1000">
+            </div>
+            <div class="input-group">
+              <label>Target %</label>
+              <input type="number" id="m1-target" value="50" min="1" max="70">
+            </div>
+            <div class="input-group">
+              <label>Seed</label>
+              <input type="number" id="m1-seed" value="12345">
+            </div>
+            <div class="input-group">
+              <label>Break Weight</label>
+              <input type="number" id="m1-breakWeight" value="5" min="1">
+            </div>
+            <div class="input-group">
+              <label>Backtrack Weight</label>
+              <input type="number" id="m1-backtrackWeight" value="1" min="1">
+            </div>
+            <div class="input-group">
+              <label>Sections X</label>
+              <input type="number" id="m1-sectionsX" value="1" min="1" max="20">
+            </div>
+            <div class="input-group">
+              <label>Sections Y</label>
+              <input type="number" id="m1-sectionsY" value="1" min="1" max="20">
+            </div>
+            <div class="input-group full-width">
+              <label>
+                <input type="checkbox" id="m1-applyVoid">
+                Apply VOID to edges
+              </label>
+            </div>
+          </div>
+          <button id="generate-module1" class="btn-primary">Generate Map</button>
+        </div>
+        
+        <!-- Module 2.1 Config -->
+        <div id="config-module2-1" class="config-panel">
+          <div class="info-box">
+            ℹ️ Load a Module 1 map first, or generate one in Module 1 tab
+          </div>
+          
+          <div id="biome-list">
+            <h3>Biomes</h3>
+            <div id="biome-entries"></div>
+            <button id="add-biome" class="btn-secondary">+ Add Biome</button>
+          </div>
+          
+          <div class="config-grid">
+            <div class="input-group">
+              <label>Floor Conversion %</label>
+              <input type="number" id="m2-floorChance" value="75" min="0" max="100">
+            </div>
+            <div class="input-group">
+              <label>Wall Conversion %</label>
+              <input type="number" id="m2-wallChance" value="50" min="0" max="100">
+            </div>
+            <div class="input-group full-width">
+              <label>Expansion Mode</label>
+              <select id="m2-expansionMode">
+                <option value="CARDINAL">Cardinal (N,S,E,W)</option>
+                <option value="ALL">All Directions (8-way)</option>
+              </select>
+            </div>
+            <div class="input-group full-width">
+              <label>Seed</label>
+              <input type="number" id="m2-seed" value="67890">
+            </div>
+          </div>
+          
+          <button id="generate-module2-1" class="btn-primary">Assign Biomes</button>
+        </div>
+      </div>
+      
+      <!-- VISUALIZER CONTROLS -->
+      <div class="section" id="visualizer-section" style="display: none;">
+        <h2>Visualizer</h2>
+        
+        <!-- Module 1 Controls -->
+        <div id="controls-module1" class="controls-panel">
+          <div class="step-info">
+            <div>Step: <span id="m1-current-step">0</span> / <span id="m1-total-steps">0</span></div>
+            <div>Action: <span id="m1-current-action">-</span></div>
+            <div>Position: <span id="m1-current-position">-</span></div>
+          </div>
+          
+          <div class="controls-grid">
+            <button id="m1-zoom-out" class="btn-icon">🔍-</button>
+            <button id="m1-zoom-in" class="btn-icon">🔍+</button>
+            <button id="m1-first">⏮ First</button>
+            <button id="m1-last">⏭ Last</button>
+            <button id="m1-prev-break">⏪ Prev Break</button>
+            <button id="m1-next-break">⏩ Next Break</button>
+            <button id="m1-prev">◀ Prev</button>
+            <button id="m1-next">▶ Next</button>
+            <button id="m1-play">▶ Play</button>
+            <button id="m1-reset">🔄 Reset</button>
+          </div>
+        </div>
+        
+        <!-- Module 2.1 Controls -->
+        <div id="controls-module2-1" class="controls-panel">
+          <div class="step-info">
+            <div>Cycle: <span id="m2-current-cycle">0</span> / <span id="m2-total-cycles">0</span></div>
+            <div>Step: <span id="m2-current-step">0</span> / <span id="m2-total-steps">0</span></div>
+            <div>Action: <span id="m2-current-action">-</span></div>
+            <div>Biome: <span id="m2-current-biome">-</span></div>
+            <div>Position: <span id="m2-current-position">-</span></div>
+          </div>
+          
+          <div class="controls-grid">
+            <button id="m2-zoom-out" class="btn-icon">🔍-</button>
+            <button id="m2-zoom-in" class="btn-icon">🔍+</button>
+            <button id="m2-prev-cycle">⏪ Prev Cycle</button>
+            <button id="m2-next-cycle">⏩ Next Cycle</button>
+            <button id="m2-prev-step">◀ Prev Step</button>
+            <button id="m2-next-step">▶ Next Step</button>
+            <button id="m2-play">▶ Play</button>
+            <button id="m2-show-final">🏁 Final</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- LEGEND -->
+      <div class="section">
+        <h2>Legend</h2>
+        
+        <!-- Module 1 Legend -->
+        <div id="legend-module1" class="legend-panel">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #8b4513;"></div>
+            <span>Wall</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f0f0f0;"></div>
+            <span>Floor</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #000;"></div>
+            <span>Void</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #3b82f6;"></div>
+            <span>Miner</span>
+          </div>
+        </div>
+        
+        <!-- Module 2.1 Legend (dynamic) -->
+        <div id="legend-module2-1" class="legend-panel">
+          <div id="biome-legend"></div>
+        </div>
+      </div>
+      
+      <!-- STATISTICS -->
+      <div class="section" id="stats-section" style="display: none;">
+        <h2>Statistics</h2>
+        
+        <!-- Module 1 Stats -->
+        <div id="stats-module1" class="stats-panel"></div>
+        
+        <!-- Module 2.1 Stats -->
+        <div id="stats-module2-1" class="stats-panel"></div>
+      </div>
+      
+      <!-- SAVE/LOAD -->
+      <div class="section">
+        <h2>Save / Load</h2>
+        <button id="save-map" class="btn-secondary">💾 Save Full</button>
+        <button id="save-compact" class="btn-secondary">📦 Save Compact</button>
+        <button id="load-map" class="btn-secondary">📂 Load Map</button>
+        <input type="file" id="file-input" accept=".json" style="display: none;">
+      </div>
+    </aside>
+  </main>
+  
+  <script type="module" src="app.js"></script>
+</body>
+</html>

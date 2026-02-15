@@ -136,7 +136,9 @@ export function runMiningAlgorithm(config: MiningConfig): MiningResult {
   console.log(`Total floor tiles: ${totalFloorCount}`)
   
   // Post-processing: apply VOID to edges
-  applyVoidToEdges(grid)
+  if (config.applyVoid) {
+    applyVoidToEdges(grid)
+  }
   
   // Calculate statistics
   const stats = calculateStats(grid, path, startTime, endTime, path[0].position)

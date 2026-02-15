@@ -25,3 +25,6 @@ Thumbs.db
 # Temp
 temp/
 tmp/
+
+# Saved maps (local only)
+saved-maps/

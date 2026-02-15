@@ -1,6 +1,6 @@
 /**
  * Domain models for Castle Run map generation.
- * Contains all core types, enums, and interfaces used throughout Module 1.
+ * Contains all core types, enums, and interfaces used throughout the project.
  */
 
 // ============================================================================
@@ -18,8 +18,6 @@ export enum TileType {
 
 /**
  * Directional movement and checking.
- * Cardinals (N,S,E,W): Used for miner movement
- * Diagonals (NE,SE,NW,SW): Used only for 2x2 floor detection
  */
 export enum Direction {
   N = 'N',
@@ -41,10 +39,24 @@ export enum MiningAction {
 }
 
 /**
- * Placeholder for region types (Module 2).
+ * Biome types for theming different areas of the map.
  */
-export enum RegionType {
-  // To be defined in Module 2
+export enum BiomeType {
+  WATER = 'WATER',
+  FOREST = 'FOREST',
+  SWAMP = 'SWAMP',
+  MAGMA = 'MAGMA',
+  ICE = 'ICE',
+  DESERT = 'DESERT',
+  DUNGEON = 'DUNGEON'
+}
+
+/**
+ * Actions during biome assignment.
+ */
+export enum BiomeAction {
+  CONVERT = 'CONVERT',     // Successful tile conversion
+  SKIP = 'SKIP'           // Failed conversion or already assigned
 }
 
 // ============================================================================
@@ -66,7 +78,7 @@ export interface Position {
 export interface Tile {
   type: TileType
   position: Position
-  region: RegionType | null
+  biome: BiomeType | null  // null until Module 2.1 assigns biomes
 }
 
 /**
@@ -89,7 +101,7 @@ export interface PathNode {
 }
 
 // ============================================================================
-// CONFIGURATION
+// MODULE 1: MINING CONFIGURATION
 // ============================================================================
 
 /**
@@ -101,15 +113,14 @@ export interface MiningConfig {
   targetPercentage: number
   breakWallWeight: number
   backtrackWeight: number
-  backtrackPenalty?: number
-  startingPos?: Position
-  seed?: number
   sectionsX?: number
   sectionsY?: number
+  applyVoid?: boolean
+  seed?: number
 }
 
 // ============================================================================
-// ALGORITHM OUTPUT
+// MODULE 1: MINING OUTPUT
 // ============================================================================
 
 /**
@@ -142,7 +153,69 @@ export interface MiningResult {
 }
 
 // ============================================================================
-// VISUALIZER MODELS (for future use)
+// MODULE 2.1: BIOME CONFIGURATION
+// ============================================================================
+
+/**
+ * Configuration for biome assignment.
+ */
+export interface BiomeConfig {
+  biomes: BiomeDefinition[]
+  floorConversionChance: number  // Default: 0.75
+  wallConversionChance: number   // Default: 0.50
+  expansionMode: 'CARDINAL' | 'ALL'  // NSWE only or all 8 directions
+  seed?: number
+}
+
+/**
+ * Definition of a single biome to be placed.
+ */
+export interface BiomeDefinition {
+  type: BiomeType
+  centerCount: number  // How many centers for this biome
+}
+
+// ============================================================================
+// MODULE 2.1: BIOME OUTPUT
+// ============================================================================
+
+/**
+ * Single step in biome expansion path.
+ */
+export interface BiomePathNode {
+  position: Position
+  biomeType: BiomeType
+  action: BiomeAction
+  cycleNumber: number    // Which iteration of the biomes loop
+  stepNumber: number     // Which tile within this biome's turn
+  timestamp: number
+}
+
+/**
+ * Statistics from biome assignment.
+ */
+export interface BiomeStats {
+  biomeCoverage: Map<BiomeType, number>  // Percentage of map per biome
+  totalBiomeCenters: number
+  tilesWithBiome: number
+  tilesWithoutBiome: number
+  conversionAttempts: number
+  successfulConversions: number
+  skippedTiles: number
+  totalCycles: number
+}
+
+/**
+ * Complete result from biome assignment.
+ */
+export interface BiomeAssignmentResult {
+  grid: Grid
+  path: BiomePathNode[]
+  stats: BiomeStats
+}
+
+// ============================================================================
+// VISUALIZER MODELS
 // ============================================================================
 
 /**

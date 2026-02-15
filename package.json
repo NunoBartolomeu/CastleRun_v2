@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev:console": "tsx src/module1/visualizers/console/console-visualizer.ts",
-    "dev:web": "npm run build && xcopy /E /I /Y dist src\\module1\\visualizers\\web\\dist && npx http-server src/module1/visualizers/web -p 3000 -o",
+    "dev:console": "tsx clients/console/console-client.ts",
+    "dev:web": "npm run build && start http://localhost:3000/src/clients/web/ && npx http-server . -p 3000 -c-1",
     "test": "vitest",
     "build": "tsc"
   },

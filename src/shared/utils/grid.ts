@@ -17,7 +17,7 @@ export function createEmptyGrid(width: number, height: number, fillType: TileTyp
       row.push({
         type: fillType,
         position: { x, y },
-        region: null
+        biome: null  // ← CHANGED from region
       })
     }
     tiles.push(row)
@@ -77,7 +77,7 @@ export function cloneGrid(grid: Grid): Grid {
       row.push({
         type: original.type,
         position: { x: original.position.x, y: original.position.y },
-        region: original.region
+        biome: original.biome  // ← CHANGED from region
       })
     }
     tiles.push(row)

@@ -3,7 +3,7 @@
  * Renders the final grid to terminal using emojis.
  */
 
-import { runMiningAlgorithm, TileType, MiningAction, type Grid, type MiningStats, type PathNode } from '../../index.js'
+import { runMiningAlgorithm, TileType, MiningAction, type Grid, type MiningStats, type PathNode } from '../../module1/index.js'
 import * as readline from 'readline'
 
 /**
@@ -97,7 +97,7 @@ function reconstructGridAtStep(path: PathNode[], stepIndex: number, width: numbe
       row.push({
         type: TileType.WALL,
         position: { x, y },
-        region: null
+        biome: null
       })
     }
     grid.tiles.push(row)

@@ -123,28 +123,4 @@ export function validateMiningConfig(config: MiningConfig): void {
       `Consider reducing section count for better results.`
     )
   }
-  
-  // Starting position validation (if provided)
-  if (config.startingPos) {
-    if (!isInBounds(config.startingPos, config.width, config.height)) {
-      throw new Error(
-        `Starting position (${config.startingPos.x}, ${config.startingPos.y}) is out of bounds ` +
-        `for grid size ${config.width}x${config.height}`
-      )
-    }
-    
-    if (isOnBorder(config.startingPos, config.width, config.height)) {
-      throw new Error(
-        `Starting position (${config.startingPos.x}, ${config.startingPos.y}) cannot be on border`
-      )
-    }
-    
-    // Warn if starting position is set but sections are being used
-    if (sectionsX > 1 || sectionsY > 1) {
-      console.warn(
-        `Warning: Starting position is ignored when using multiple sections. ` +
-        `Each section will get a random starting position.`
-      )
-    }
-  }
 }
